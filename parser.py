@@ -122,9 +122,9 @@ def read_mwx_content(fname):
         fileContent = file.read()
         mw = fileContent.find(b'\x00m\x00w')
         space = fileContent[mw:].find(b' \x00') + mw
-        dot = fileContent[space:].find(b'\x00\x00') + space + 1
-        """S.F.: Заменил dot = fileContent[space:].find(b'.\x00') + space"""
+        dot = fileContent[space:].find(b'.\x00') + space
         language = fileContent[space:dot].decode('utf-16').replace('\x00', '').strip()
+
         start = fileContent.find(b'[')
         end = fileContent[start:].find(b']') + start
 
@@ -856,15 +856,18 @@ if __name__ == "__main__":
                         "          (в частности, на этом уровне можно проверять абстрактное синтаксическое дерево,\n"
                         "          которое строит программа). Значением по умолчанию этого аргумента является INFO.")
 
-    try:
-        cmd_args = p.parse_args()
-    except:
+    p.add_argument('--destfile', type=str, dest="destfile", default="data1.js",
+                   help="Name for file to write compilation result")
+    #try:
+    cmd_args = p.parse_args()
+
+    #except:
         # для целей тестирования можно запускать этот код без командной строки,
         # тогда нужные аргументы нужно прописать ниже:
-        cmd_line = ["test_projects/bug72-asktest.mwx", '--libreoffice',
-                    "C:/Program Files (x86)/LibreOffice 5/program/soffice.exe",
-                    "--log", "debug"]
-        cmd_args = p.parse_args(cmd_line)
+    #    cmd_line = ["test_projects/bug72-asktest.mwx", '--libreoffice',
+    #                "C:/Program Files (x86)/LibreOffice 5/program/soffice.exe",
+    #                "--log", "debug"]
+    #    cmd_args = p.parse_args(cmd_line)
 
     try:
         # устанавливаем уровень логгирования
@@ -907,7 +910,7 @@ if __name__ == "__main__":
         os.remove(TEMPORARY_FILE)
 
         logger.info("Writing data...")
-        with open(os.path.join(BASE_DIR, 'data.js'), 'w', encoding='utf-8') as fo:
+        with open(os.path.join(BASE_DIR, cmd_args.destfile), 'w', encoding='utf-8') as fo:
             fo.write("projectData = {};".format(obj.to_JSON()))
         logger.info("Processing finished.")
         print('0', file=sys.stderr)
