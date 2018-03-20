@@ -122,9 +122,9 @@ def read_mwx_content(fname):
         fileContent = file.read()
         mw = fileContent.find(b'\x00m\x00w')
         space = fileContent[mw:].find(b' \x00') + mw
-        dot = fileContent[space:].find(b'.\x00') + space
+        dot = fileContent[space:].find(b'\x00\x00') + space + 1
+        """S.F.: Заменил dot = fileContent[space:].find(b'.\x00') + space"""
         language = fileContent[space:dot].decode('utf-16').replace('\x00', '').strip()
-
         start = fileContent.find(b'[')
         end = fileContent[start:].find(b']') + start
 
